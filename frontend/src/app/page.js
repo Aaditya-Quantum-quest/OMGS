@@ -12,6 +12,7 @@ import CartSidebar from "@/components/cartSidebar";
 import Sidebar from "@/components/section/Sidebar";
 import LeftSidedSingleHomeSection from "@/components/section/LeftSidedSingleHomeSection";
 import RightSidedSingleHomeSection from "@/components/section/RightSidedSingleHomeSection";
+import NameplateShowcase from "@/components/acrylic-nameplate/NameplateShowcase";
 
 const HomeClient = () => {
   const router = useRouter();
@@ -51,6 +52,7 @@ const HomeClient = () => {
       {/* <HeadingTitle /> */}
       {/* <ShowCase /> */}
       <GallerySection />
+      <NameplateShowcase />
       {/* <ProductPage /> */}
       {/* <CartSidebar /> */}
       {/* <Sidebar /> */}
