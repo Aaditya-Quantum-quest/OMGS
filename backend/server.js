@@ -60,9 +60,13 @@ app.use('/api/', addressRoutes);
 
 
 //  USER PROFILE ROUTES
-app.use('/api/user', require('./routes/userDashboard')); 
+app.use('/api/user', require('./routes/userDashboard'));
 
 
+// NAmeplate Orders 
+const nameplateOrderRoutes = require('./routes/nameplateOrders'); // New route
+
+app.use('/api/nameplateorders', nameplateOrderRoutes); // New nameplate orders route
 
 // STATIC
 app.use('/uploads', express.static('uploads'));
