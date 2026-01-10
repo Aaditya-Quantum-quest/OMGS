@@ -58,6 +58,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Package, Image, Users, Receipt, ChevronRight } from 'lucide-react';
+import Sidebar from '@/components/section/Sidebar';
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
@@ -68,6 +69,7 @@ export default function DashboardLayout({ children }) {
     { href: '/dashboard/gallery', label: 'Gallery', icon: Image },
     { href: '/dashboard/customers', label: 'Customers', icon: Users },
     { href: '/dashboard/orders', label: 'Orders', icon: Receipt },
+    { href: '/dashboard/nameplate-orders', label: 'Nameplate Orders', icon: Receipt },
   ];
 
   const isActive = (href) => pathname === href;
@@ -75,6 +77,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation Bar */}
+      <Sidebar />
       <div className="fixed top-16 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-3">
           {/* Desktop Navigation */}

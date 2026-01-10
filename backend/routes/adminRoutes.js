@@ -8,6 +8,7 @@ const Product = require('../models/Product');
 const GalleryImage = require('../models/GalleryImage');
 const User = require('../models/User');
 const Order = require('../models/Order');
+const NameplateOrders = require('../models/NameplateOrder');
 
 // For image uploads by admin
 const multer = require('multer');
@@ -51,11 +52,11 @@ router.put('/products/:id', async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    
+
     res.json({ message: 'Product updated', product });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update product', error: err.message });
@@ -77,11 +78,11 @@ router.get('/products', async (req, res) => {
 router.delete('/products/:id', async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    
+
     // Optional: Delete associated image files
     if (product.additionalImages && product.additionalImages.length > 0) {
       product.additionalImages.forEach(imageUrl => {
@@ -92,7 +93,7 @@ router.delete('/products/:id', async (req, res) => {
         }
       });
     }
-    
+
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete product', error: err.message });
@@ -197,6 +198,66 @@ router.get('/orders', async (req, res) => {
 router.delete('/orders/:id', async (req, res) => {
   await Order.findByIdAndDelete(req.params.id);
   res.json({ message: 'Order Deleted ' })
+});
+
+
+// NAMEPLATE ORDERS
+
+// router.get('/nameplate-orders', async (req, res) => {
+//   try {
+//     const nameplateOrders = await NameplateOrders.find()
+//       .populate('customer', 'email phone firstName lastName')
+//       .populate('items', 'name dimensions price');
+//     res.json(nameplateOrders);
+//   } catch (err) {
+//     res.status(500).json({ message: 'Failed to fetch nameplate orders', error: err.message });
+//   }
+// });
+
+
+router.get('/nameplate-orders', async (req, res) => {
+  try {
+    const nameplateOrders = await NameplateOrders
+      .find()
+      .sort({ createdAt: -1 });
+
+    res.json(nameplateOrders);
+  } catch (err) {
+    res.status(500).json({
+      message: 'Failed to fetch nameplate orders',
+      error: err.message
+    });
+  }
+});
+
+
+
+
+router.delete('/nameplate-orders/:id', async (req, res) => {
+  try {
+    const deletedOrder = await NameplateOrders.findByIdAndDelete(req.params.id);
+    if (!deletedOrder) {
+      return res.status(404).json({ message: 'Nameplate order not found' });
+    }
+    res.json({ message: 'Nameplate order deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete nameplate order', error: err.message });
+  }
+});
+
+
+
+router.get('/nameplate-orders/:id', async (req, res) => {
+  try {
+    const order = await NameplateOrders.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Nameplate order not found' });
+    }
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch nameplate order', error: err.message });
+  }
 });
 
 module.exports = router;

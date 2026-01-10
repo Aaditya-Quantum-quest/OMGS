@@ -141,7 +141,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ShoppingCart, User, LogIn, UserPlus, ChevronDown } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, LogIn, UserPlus, ChevronDown, Home, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/cartContext';
@@ -225,8 +225,8 @@ export default function Header() {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-lg'
-            : 'bg-white shadow-md'
+          ? 'bg-white/95 backdrop-blur-md shadow-lg'
+          : 'bg-white shadow-md'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4">
@@ -357,11 +357,16 @@ export default function Header() {
                 className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="text-gray-700 font-medium">Home</span>
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Home
+                  </span>
+                </div>
               </Link>
 
               {/* Products Accordion */}
-              <div className="border-b border-gray-200 pb-2">
+              {/* <div className="border-b border-gray-200 pb-2">
                 <button
                   onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
                   className="w-full cursor-pointer flex items-center justify-between p-3 hover:bg-gray-100 rounded-md transition-colors"
@@ -400,7 +405,124 @@ export default function Header() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
+
+              {/* Individual Products Links */}
+              {/* 1 st Product  */}
+              <Link
+                href="/products/acrylic-photo"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Acrylic Photo
+                  </span>
+                </div>
+              </Link>
+
+
+              {/* 2nd Product  */}
+              <Link
+                href="/products/clear-acrylic-photo"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Clear Acrylic Photo
+                  </span>
+                </div>
+              </Link>
+
+
+              {/* 3rd Product  */}
+              <Link
+                href="/products/acrylic-wall-clock"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Acrylic Wall Clock
+                  </span>
+                </div>
+              </Link>
+
+              {/* 4th Product */}
+              <Link
+                href="/products/framed-acrylic-photo"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Framed Acrylic Photo
+                  </span>
+                </div>
+              </Link>
+
+              {/* 5th Product  */}
+              <Link
+                href="/products/collage-acrylic-photo"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Collage Acrylic Photo
+                  </span>
+                </div>
+              </Link>
+
+              {/* 6th Product  */}
+
+              <Link
+                href="/products/acrylic-cutout"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Acrylic Cutout
+                  </span>
+                </div>
+              </Link>
+
+              {/* 7th Product   */}
+
+              <Link
+                href="/products/miniphoto-gallery"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Mini Photo Gallery
+                  </span>
+                </div>
+              </Link>
+
+              {/* 8th Product   */}
+              <Link
+                href="/products/acrylic-nameplate"
+                className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div>
+                  <span className="text-gray-700 font-medium flex items-center gap-2">
+                    <Home className="h-5 w-5 text-gray-700" />
+                    Acrylic Name Plate
+                  </span>
+                </div>
+              </Link>
 
               {/* Contact Us Link */}
               <Link
@@ -408,7 +530,10 @@ export default function Header() {
                 className="flex cursor-pointer items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="text-gray-700 font-medium">Contact Us</span>
+                <div className='text-gray-700 font-medium flex items-center gap-2'>
+                  <Phone className="h-5 w-5 text-gray-700 cursor-pointer flex " />
+                  <span className="text-gray-700 font-medium">Contact Us</span>
+                </div>
               </Link>
 
               {/* About Link */}
@@ -417,7 +542,11 @@ export default function Header() {
                 className="flex cursor-pointer items-center space-x-3 p-3 hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="text-gray-700 font-medium">About</span>
+                <div>
+                  {/* <About className="h-5 w-5 text-gray-700 cursor-pointer" /> */}
+                  <span className="text-gray-700 font-medium">About</span>
+
+                </div>
               </Link>
 
               {/* Cart Link (Mobile) */}

@@ -737,7 +737,7 @@ export default function OrdersAdminPage() {
           <div>
             <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
               <Receipt className="w-10 h-10 text-purple-400" />
-              Orders Management
+             Frame Orders Management
             </h1>
             <p className="text-purple-300">Track and manage customer orders</p>
           </div>
@@ -853,7 +853,7 @@ export default function OrdersAdminPage() {
           <div className="px-8 py-6 border-b border-white/10">
             <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
               <Receipt className="w-6 h-6 text-purple-400" />
-              All Orders
+              Frame Orders
               <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-sm font-medium rounded-full">
                 {filteredOrders.length}
               </span>

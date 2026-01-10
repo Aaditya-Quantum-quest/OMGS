@@ -561,6 +561,7 @@
 
 'use client';
 
+import Sidebar from '@/components/section/Sidebar';
 import { useEffect, useState } from 'react';
 
 export default function Checkout() {
@@ -872,7 +873,9 @@ export default function Checkout() {
 
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4">
+        <div className="min-h-screen bg-gray-100 p-4 pt-25">
+
+            <Sidebar />
             {/* Header */}
             <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md mb-4 p-4">
                 <div className="flex items-center gap-2">

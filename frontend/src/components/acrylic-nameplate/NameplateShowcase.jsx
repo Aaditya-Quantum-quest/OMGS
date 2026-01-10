@@ -50,13 +50,13 @@
 //       localStorage.setItem('nameplateBackground', product.image);
 //       localStorage.setItem('selectedProductId', productId.toString());
 //       localStorage.setItem('selectedProductTitle', product.title);
-      
+
 //       console.log(`Customizing product ${productId}`);
 //       console.log('Image saved to localStorage:', product.image);
-      
+
 //       // Navigate to editor page (uncomment when ready)
 //       // router.push('/editor');
-      
+
 //       // Show success message
 //       // alert(`Product image saved! Ready to customize.\nImage: ${product.image}`);
 //       setTimeout(() => {
@@ -101,7 +101,7 @@
 //                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
 //                   {product.title}
 //                 </h3>
-                
+
 //                 {/* Customize Button */}
 //                 <button
 //                   onClick={() => handleCustomize(product.id)}
@@ -134,21 +134,21 @@ export default function ProductShowcase() {
       image: 'https://res.cloudinary.com/dewxpvl5s/image/upload/v1767948688/nameplate-1_eqnnzt.webp',
       title: 'Ganesa Acrylic Designer Name Plate',
       description: 'SUNIL LAMBA\nRENU DEVI\n55 SHIV NAGAR III',
-      customizable_image:"https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-1_erq5vs.png",
+      customizable_image: "https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-1_erq5vs.png",
     },
     {
       id: 2,
       image: 'https://res.cloudinary.com/dewxpvl5s/image/upload/v1767948688/nameplate-2_r41hp8.webp',
       title: 'Ganesa Square Acrylic Designer Name Plate',
       description: 'Anand Niwas\nS K Nahar\nChitra Nahar\n30, Karol Bagh',
-      customizable_image:"https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-2_zcgiqi.png",
+      customizable_image: "https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-2_zcgiqi.png",
     },
     {
       id: 3,
       image: 'https://res.cloudinary.com/dewxpvl5s/image/upload/v1767948688/nameplate-3_gi8p4s.webp',
       title: 'Ganesa Portrait Acrylic Designer Name Plate',
       description: 'Shanti Sadan\nSantosh Kumar\nVimala Devi\n21, Kambha Nagar',
-      customizable_image:"https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-3_w2juiw.png",
+      customizable_image: "https://res.cloudinary.com/dewxpvl5s/image/upload/v1767950031/nameplate-custom-3_w2juiw.png",
     }
   ];
 
@@ -159,25 +159,25 @@ export default function ProductShowcase() {
       localStorage.removeItem('nameplateBackground');
       localStorage.removeItem('selectedProductId');
       localStorage.removeItem('selectedProductTitle');
-      
+
       // ✅ Save with explicit verification
       localStorage.setItem('nameplateBackground', product.customizable_image);
       localStorage.setItem('selectedProductId', productId.toString());
       localStorage.setItem('selectedProductTitle', product.title);
-      
+
       // ✅ IMMEDIATE VERIFICATION - Check if it actually saved
       const savedImage = localStorage.getItem('nameplateBackground');
       const savedId = localStorage.getItem('selectedProductId');
-      
+
       console.log('🟢 SAVED TO LOCALSTORAGE:', {
         image: savedImage,
         id: savedId,
         title: localStorage.getItem('selectedProductTitle'),
         productImageLength: product.image.length // Should be > 0
       });
-      
+
       setDebugInfo(`✅ Saved: ${product.title}\nImage: ${savedImage?.substring(0, 50)}...`);
-      
+
       // Navigate after DOM update
       setTimeout(() => {
         console.log('🚀 Navigating to /nameplate-editor');
@@ -187,13 +187,21 @@ export default function ProductShowcase() {
   };
 
   // Debug: Check localStorage on mount
+  // useEffect(() => {
+  //   const existing = localStorage.getItem('nameplateBackground');
+  //   if (existing) {
+  //     console.log('💾 Existing localStorage on load:', existing);
+  //     setDebugInfo(`Found existing: ${existing.substring(0, 50)}...`);
+  //   }
+  // }, []);
+
   useEffect(() => {
     const existing = localStorage.getItem('nameplateBackground');
     if (existing) {
       console.log('💾 Existing localStorage on load:', existing);
-      setDebugInfo(`Found existing: ${existing.substring(0, 50)}...`);
     }
   }, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -204,7 +212,7 @@ export default function ProductShowcase() {
             {debugInfo}
           </div>
         )}
-        
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -237,7 +245,7 @@ export default function ProductShowcase() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   {product.title}
                 </h3>
-                
+
                 {/* Customize Button */}
                 <button
                   onClick={() => handleCustomize(product.id)}

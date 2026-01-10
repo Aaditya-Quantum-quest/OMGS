@@ -42,7 +42,7 @@ const WeddingGallery = () => {
   };
 
   return (
-    <div className="bg-white px-4 sm:px-6 lg:px-8 pb-20" id='Gallery'>
+    <div className="bg-white px-4 sm:px-6 lg:px-8 py-20" id='Gallery' >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

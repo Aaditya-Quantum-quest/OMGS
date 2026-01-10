@@ -888,12 +888,12 @@
 
 
 
-
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Type, X, Trash2, Move } from 'lucide-react';
 import { domToPng } from 'modern-screenshot'; // ✅ Add this line
+import Sidebar from '@/components/section/Sidebar';
 
 export default function NameplateEditor() {
     const [backgroundImage, setBackgroundImage] = useState(null);
@@ -1104,7 +1104,8 @@ export default function NameplateEditor() {
 
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4">
+        <div className="min-h-screen bg-gray-100 p-4 pt-25">
+            <Sidebar />
             {/* Header */}
             <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md mb-4 p-4">
                 <div className="flex items-center justify-between">
