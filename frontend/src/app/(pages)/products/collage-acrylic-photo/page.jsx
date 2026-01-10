@@ -1,6 +1,7 @@
 import Hero2 from '@/components/section/Hero2';
 import ProductsByCategory from '@/components/section/Products';
 import React, { Fragment } from 'react'
+import Sidebar from '@/components/section/Sidebar';
 
 // export const metadata ={
 //   title:'Collage Acrylic Photo'
@@ -9,9 +10,10 @@ import React, { Fragment } from 'react'
 const Collage_Acrylic_Photo = () => {
     return (
         <Fragment>
+            <Sidebar />
 
             <Hero2 title="Collage Acrylic Photo" subtitle="Many moments, one frame" tagline="This collage acrylic photo blends multiple memories into one vibrant display, featuring glossy clarity, smooth edges, and modern durability—perfect for celebrating stories, gifting, and decorating any space beautifully" />
-             <ProductsByCategory category='Collage Acrylic Photo' Heading='Collage Acrylic Photo' />
+            <ProductsByCategory category='Collage Acrylic Photo' Heading='Collage Acrylic Photo' />
         </Fragment>
     )
 }

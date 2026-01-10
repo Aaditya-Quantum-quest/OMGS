@@ -1,10 +1,12 @@
 import Hero2 from '@/components/section/Hero2';
 import ProductsByCategory from '@/components/section/Products';
 import React, { Fragment } from 'react'
+import Sidebar from '@/components/section/Sidebar';
 
 const Miniphoto_Gallery = () => {
     return (
         <Fragment>
+            <Sidebar /> 
             <Hero2
                 title="Mini Photo Gallery"
                 subtitle="Small moments, big impact"
