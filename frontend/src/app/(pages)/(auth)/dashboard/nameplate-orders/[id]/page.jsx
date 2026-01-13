@@ -575,8 +575,8 @@ export default function NameplateOrderDetails() {
             // Define column positions - using actual measurements
             const colItem = margin + 2;           // 22mm from left
             const colSpecs = margin + 20;         // 40mm from left
-            const colQty = pageWidth - 50;        // Fixed position for Qty
-            const colPrice = pageWidth - 25;      // Fixed position for Price
+            const colQty = pageWidth - 70;        // Fixed position for Qty
+            const colPrice = pageWidth - 32;      // Fixed position for Price
 
             addText('Item', colItem, yPosition, 10, 'bold');
             addText('Specifications', colSpecs, yPosition, 10, 'bold');
@@ -619,14 +619,14 @@ export default function NameplateOrderDetails() {
             pdf.rect(margin, yPosition - 5, pageWidth - 2 * margin, 12, 'F');
 
             // Total label
-            addText('TOTAL AMOUNT', margin + 2, yPosition + 2, 12, 'bold', [255, 255, 255]);
+            addText('TOTAL AMOUNT', margin + 2, yPosition + 3, 12, 'bold', [255, 255, 255]);
 
             // Total amount (right aligned)
             pdf.setFontSize(14);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(255, 255, 255);
             const totalAmount = orderData.totalAmount;
-            pdf.text(totalAmount, pageWidth - 25, yPosition + 2);
+            pdf.text(totalAmount, pageWidth - 40, yPosition + 3);
 
             pdf.setTextColor(0, 0, 0);
             pdf.setFont('helvetica', 'normal');

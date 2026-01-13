@@ -271,6 +271,8 @@ const User = require('../models/User');
 const Order = require('../models/Order');
 const Address = require('../models/Address');
 const auth = require('../middleware/auth');
+const NameplateOrder = require('../models/NameplateOrder');
+
 
 // 1. USER PROFILE - Fixed for current logged-in user
 router.get('/users/:userId', auth, async (req, res) => {
@@ -289,9 +291,9 @@ router.get('/users/:userId', auth, async (req, res) => {
 router.get('/orders/user/:userId', auth, async (req, res) => {
   try {
     const userId = req.user.id || req.params.userId;
-    
+
     console.log('🔍 Orders for logged-in user:', userId);
-    
+
     const orders = await Order.find({
       $or: [
         { user: userId },
@@ -300,10 +302,10 @@ router.get('/orders/user/:userId', auth, async (req, res) => {
         { email: req.user.email }
       ]
     })
-    .populate('user', 'name email')
-    .sort({ createdAt: -1 })
-    .limit(10);
-    
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
     console.log(`✅ Current user orders: ${orders.length}`);
     res.json(orders);
   } catch (error) {
@@ -316,9 +318,9 @@ router.get('/orders/user/:userId', auth, async (req, res) => {
 router.get('/addresses/user/:userId', auth, async (req, res) => {
   try {
     const userId = req.user.id || req.params.userId;
-    
+
     console.log('🔍 Addresses for logged-in user:', userId);
-    
+
     const addresses = await Address.find({
       $or: [
         { user: userId },
@@ -327,7 +329,7 @@ router.get('/addresses/user/:userId', auth, async (req, res) => {
         { email: req.user.email }
       ]
     }).sort({ createdAt: -1 });
-    
+
     console.log(`✅ Current user addresses: ${addresses.length}`);
     res.json(addresses);
   } catch (error) {
@@ -341,18 +343,18 @@ router.get('/dashboard/:orderId', auth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId)
       .populate('user', 'name email phone');
-    
+
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     // Verify user owns order
     if (order.user._id.toString() !== req.user.id && !req.user.isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
-    
-    const address = await Address.findOne({ 
-      $or: [{ orderId: order.orderId }, { order: order._id }] 
+
+    const address = await Address.findOne({
+      $or: [{ orderId: order.orderId }, { order: order._id }]
     });
-    
+
     res.json({
       order: {
         ...order._doc,
@@ -365,5 +367,73 @@ router.get('/dashboard/:orderId', auth, async (req, res) => {
     res.status(500).json({ message: 'Order detail error' });
   }
 });
+
+
+
+// router.get('/user/orders/nameplates/user', auth, async (req, res) => {
+//   try {
+//     const email = req.user.email.toLowerCase();
+
+//     console.log('🔍 Nameplate orders for:', email);
+
+//     const orders = await NameplateOrder.find({
+//       'customer.email': email
+//     })
+//       .sort({ createdAt: -1 });
+
+//     console.log(`✅ Nameplate orders found: ${orders.length}`);
+//     res.status(200).json(orders);
+//   } catch (error) {
+//     console.error('❌ Nameplate orders error:', error);
+//     res.status(500).json([]);
+//   }
+// });
+
+
+
+// router.get('/', auth, async (req, res) => {
+//   try {
+//     console.log('🔍 Fetching nameplate orders for user:', req.user.email);
+
+//     const orders = await NameplateOrder.find({
+//       $or: [
+//         { 'customer.email': req.user.email.toLowerCase() },
+//         { userId: req.user.id },
+//         { user: req.user.id }
+//       ]
+//     })
+//       .populate('customer', 'firstName lastName phone email')
+//       .populate('size')
+//       .sort({ createdAt: -1 });
+
+//     console.log(`✅ Nameplate orders found: ${orders.length}`);
+//     res.status(200).json(orders);
+//   } catch (error) {
+//     console.error('❌ Nameplate orders error:', error);
+//     res.status(500).json({
+//       message: 'Failed to fetch nameplate orders',
+//       error: error.message
+//     });
+//   }
+// });
+
+
+router.get('/', auth, async (req, res) => {
+  try {
+    const orders = await NameplateOrder.find({ 'customer.email': req.user.email })
+      .populate('customer', 'firstName lastName phone email')
+      .populate('size')
+      .sort({ createdAt: -1 });
+
+    // ✅ ALWAYS RETURN ARRAY
+    res.status(200).json(orders || []);
+  } catch (error) {
+    console.error('❌ Nameplate orders error:', error);
+    // ✅ RETURN EMPTY ARRAY ON ERROR (not object)
+    res.status(500).json([]);
+  }
+});
+
+
 
 module.exports = router;

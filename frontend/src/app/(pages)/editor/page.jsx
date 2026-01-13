@@ -2,12 +2,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Image as KonvaImage, Rect, Shape, Group, Line, Text } from "react-konva";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import Sidebar from "@/components/section/Sidebar";
 // Silence TensorFlow.js and ONNX Runtime warnings
 if (typeof window !== 'undefined') {
   const originalWarn = console.warn;
   const originalError = console.error;
-  
+
   console.warn = (...args) => {
     const message = args[0]?.toString() || '';
     if (
@@ -23,7 +23,7 @@ if (typeof window !== 'undefined') {
     }
     originalWarn.apply(console, args);
   };
-  
+
   console.error = (...args) => {
     const message = args[0]?.toString() || '';
     if (
@@ -148,7 +148,7 @@ export default function FrameEditor() {
   const [bgRemovedImg, setBgRemovedImg] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  
+
   const initialShape = isAcrylicClock ? CLOCK_SHAPES.CIRCLE_CLOCK : FRAME_SHAPES.ROUNDED_RECT;
   const [selectedShape, setSelectedShape] = useState(initialShape);
 
@@ -362,7 +362,7 @@ export default function FrameEditor() {
     };
 
     window.frameDesignData = designData;
-    
+
     console.log('Design saved:', designData);
 
     router.push('/p');
@@ -418,7 +418,7 @@ export default function FrameEditor() {
   // Get proper radius for different shapes
   const getShapeRadius = () => {
     const baseSize = Math.min(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-    
+
     if (selectedShape.isHexagon || selectedShape.isOctagon) {
       return baseSize * 0.35;
     } else if (selectedShape.isDiamond) {
@@ -430,23 +430,145 @@ export default function FrameEditor() {
   };
 
   // Render clock hands and numbers with customizable colors
-  const renderClockOverlay = () => {
+  // const renderClockOverlay = () => {
+  //   const centerX = PREVIEW_WIDTH / 2;
+  //   const centerY = PREVIEW_HEIGHT / 2;
+  //   const radius = getShapeRadius();
+
+  //   const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  //   const fontSize = radius * 0.18;
+
+  //   return (
+  //     <Group>
+  //       {/* Clock numbers */}
+  //       {numbers.map((num, index) => {
+  //         const angle = (index * 30 - 90) * (Math.PI / 180);
+  //         const numberRadius = radius * 0.75;
+  //         const x = centerX + numberRadius * Math.cos(angle);
+  //         const y = centerY + numberRadius * Math.sin(angle);
+
+  //         return (
+  //           <Text
+  //             key={num}
+  //             x={x}
+  //             y={y}
+  //             text={num.toString()}
+  //             fontSize={fontSize}
+  //             fontFamily="Arial, sans-serif"
+  //             fontStyle="bold"
+  //             fill={clockNumberColor}
+  //             align="center"
+  //             verticalAlign="middle"
+  //             offsetX={fontSize / 2}
+  //             offsetY={fontSize / 2}
+  //           />
+  //         );
+  //       })}
+
+  //       {/* Hour markers */}
+  //       {Array.from({ length: 12 }).map((_, index) => {
+  //         const angle = (index * 30 - 90) * (Math.PI / 180);
+  //         const markerRadius = radius * 0.90;
+  //         const x = centerX + markerRadius * Math.cos(angle);
+  //         const y = centerY + markerRadius * Math.sin(angle);
+
+  //         return (
+  //           <Shape
+  //             key={`marker-${index}`}
+  //             sceneFunc={(ctx, shape) => {
+  //               ctx.beginPath();
+  //               ctx.arc(x, y, radius * 0.025, 0, Math.PI * 2);
+  //               ctx.fillStrokeShape(shape);
+  //             }}
+  //             fill={clockNumberColor}
+  //             opacity={0.5}
+  //           />
+  //         );
+  //       })}
+
+  //       {/* Hour hand */}
+  //       <Line
+  //         points={[
+  //           centerX, 
+  //           centerY, 
+  //           centerX + radius * 0.45 * Math.cos((-90 + 60) * Math.PI / 180), 
+  //           centerY + radius * 0.45 * Math.sin((-90 + 60) * Math.PI / 180)
+  //         ]}
+  //         stroke={clockHandColor}
+  //         strokeWidth={radius * 0.045}
+  //         lineCap="round"
+  //       />
+
+  //       {/* Minute hand */}
+  //       <Line
+  //         points={[
+  //           centerX, 
+  //           centerY, 
+  //           centerX + radius * 0.65 * Math.cos((-90 + 180) * Math.PI / 180), 
+  //           centerY + radius * 0.65 * Math.sin((-90 + 180) * Math.PI / 180)
+  //         ]}
+  //         stroke={clockHandColor}
+  //         strokeWidth={radius * 0.03}
+  //         lineCap="round"
+  //       />
+
+  //       {/* Second hand */}
+  //       <Line
+  //         points={[
+  //           centerX, 
+  //           centerY, 
+  //           centerX + radius * 0.70 * Math.cos((-90 + 270) * Math.PI / 180), 
+  //           centerY + radius * 0.70 * Math.sin((-90 + 270) * Math.PI / 180)
+  //         ]}
+  //         stroke={clockSecondHandColor}
+  //         strokeWidth={radius * 0.018}
+  //         lineCap="round"
+  //       />
+
+  //       {/* Center dot */}
+  //       <Shape
+  //         sceneFunc={(ctx, shape) => {
+  //           ctx.beginPath();
+  //           ctx.arc(centerX, centerY, radius * 0.06, 0, Math.PI * 2);
+  //           ctx.fillStrokeShape(shape);
+  //         }}
+  //         fill={clockHandColor}
+  //       />
+  //     </Group>
+  //   );
+  // };
+
+
+  // 1. CIRCLE CLOCK NUMBERS
+  const renderCircleClockNumbers = () => {
     const centerX = PREVIEW_WIDTH / 2;
     const centerY = PREVIEW_HEIGHT / 2;
     const radius = getShapeRadius();
-
     const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
     const fontSize = radius * 0.18;
-    
+
+    // ADJUST THIS: Distance of numbers from center (0.75 = 75% of radius)
+    const numberRadius = radius * 1;
+
+    // Get current time
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+    const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+    const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+    const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
     return (
       <Group>
-        {/* Clock numbers */}
+        {/* Clock Numbers - properly centered */}
         {numbers.map((num, index) => {
-          const angle = (index * 30 - 90) * (Math.PI / 180);
-          const numberRadius = radius * 0.75;
+          const angle = (index * 30 - 90) * (Math.PI / 180); // 30 degrees per number
           const x = centerX + numberRadius * Math.cos(angle);
           const y = centerY + numberRadius * Math.sin(angle);
-          
+
           return (
             <Text
               key={num}
@@ -454,34 +576,784 @@ export default function FrameEditor() {
               y={y}
               text={num.toString()}
               fontSize={fontSize}
-              fontFamily="Arial, sans-serif"
-              fontStyle="bold"
+              fontFamily="Arial Black, sans-serif"
+              fontWeight={700}
               fill={clockNumberColor}
               align="center"
               verticalAlign="middle"
-              offsetX={fontSize / 2}
-              offsetY={fontSize / 2}
+              // ADJUST THESE: Fine-tune number positioning
+              offsetX={fontSize * 0.5} // Horizontal centering (0.5 = 50% of font size)
+              offsetY={fontSize * 0.5} // Vertical centering (0.5 = 50% of font size)
+              shadowColor="rgba(0,0,0,0.3)"
+              shadowBlur={4}
             />
           );
         })}
 
-        {/* Hour markers */}
-        {Array.from({ length: 12 }).map((_, index) => {
-          const angle = (index * 30 - 90) * (Math.PI / 180);
-          const markerRadius = radius * 0.90;
-          const x = centerX + markerRadius * Math.cos(angle);
-          const y = centerY + markerRadius * Math.sin(angle);
-          
+        {/* Hour hand - Shortest and thickest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.50 = 50% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.50 * Math.cos(hourAngle),
+            centerY + radius * 0.50 * Math.sin(hourAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.045} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Minute hand - Medium length and thickness */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.65 = 65% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 1 * Math.cos(minuteAngle),
+            centerY + radius * 0.65 * Math.sin(minuteAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.03} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Second hand - Longest and thinnest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.70 = 70% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.9 * Math.cos(secondAngle),
+            centerY + radius * 0.70 * Math.sin(secondAngle)
+          ]}
+          stroke={clockSecondHandColor}
+          strokeWidth={radius * 0.018} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowBlur={2}
+        />
+
+        {/* Center dot - covers where all hands meet */}
+        <Shape
+          sceneFunc={(ctx, shape) => {
+            ctx.beginPath();
+            // ADJUST THIS: 0.04 = 4% of radius for center dot size
+            ctx.arc(centerX, centerY, radius * 0.04, 0, Math.PI * 2);
+            ctx.fillStrokeShape(shape);
+          }}
+          fill={clockHandColor}
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+      </Group>
+    );
+  };
+
+  // 2. SQUARE CLOCK NUMBERS
+  const renderSquareClockNumbers = () => {
+    const centerX = PREVIEW_WIDTH / 2;
+    const centerY = PREVIEW_HEIGHT / 2;
+    const clockSize = Math.min(PREVIEW_WIDTH, PREVIEW_HEIGHT) * 0.85;
+    const padding = clockSize * 0.08;
+    const innerSize = clockSize - padding * 2;
+    const fontSize = innerSize * 0.12;
+
+    return (
+      <Group>
+        {/* TOP: 11, 12, 1 */}
+        {[11, 12, 1].map((num, idx) => (
+          <Text
+            key={`top-${num}`}
+            x={centerX - innerSize / 2 + padding + (idx * innerSize / 3)}
+            y={centerY - innerSize / 2 + padding + 8}
+            text={num.toString()}
+            fontSize={fontSize}
+            fontFamily="Arial Black, sans-serif"
+            fontWeight={700}
+            fill={clockNumberColor}
+            shadowColor="rgba(0,0,0,0.3)"
+            shadowBlur={4}
+          />
+        ))}
+
+        {/* RIGHT: 2, 3 */}
+        {[2, 3].map((num, idx) => (
+          <Text
+            key={`right-${num}`}
+            x={centerX + innerSize / 2 - padding - 12}
+            y={centerY - innerSize / 6 + (idx * innerSize / 3)}
+            text={num.toString()}
+            fontSize={fontSize}
+            fontFamily="Arial Black, sans-serif"
+            fontWeight={700}
+            fill={clockNumberColor}
+            rotation={90}
+            shadowColor="rgba(0,0,0,0.3)"
+            shadowBlur={4}
+          />
+        ))}
+
+        {/* BOTTOM: 4, 5, 6 */}
+        {[4, 5, 6].map((num, idx) => (
+          <Text
+            key={`bottom-${num}`}
+            x={centerX - innerSize / 2 + padding + (idx * innerSize / 3)}
+            y={centerY + innerSize / 2 - padding - fontSize - 8}
+            text={num.toString()}
+            fontSize={fontSize}
+            fontFamily="Arial Black, sans-serif"
+            fontWeight={700}
+            fill={clockNumberColor}
+            shadowColor="rgba(0,0,0,0.3)"
+            shadowBlur={4}
+          />
+        ))}
+
+        {/* LEFT: 7, 8, 9, 10 */}
+        {[7, 8, 9, 10].map((num, idx) => (
+          <Text
+            key={`left-${num}`}
+            x={centerX - innerSize / 2 + padding + 8}
+            y={centerY - innerSize / 6 + (idx * innerSize / 4)}
+            text={num.toString()}
+            fontSize={fontSize}
+            fontFamily="Arial Black, sans-serif"
+            fontWeight={700}
+            fill={clockNumberColor}
+            rotation={-90}
+            shadowColor="rgba(0,0,0,0.3)"
+            shadowBlur={4}
+          />
+        ))}
+      </Group>
+    );
+  };
+
+  // 3. HEXAGON CLOCK NUMBERS
+  const renderHexagonClockNumbers = () => {
+    const centerX = PREVIEW_WIDTH / 2;
+    const centerY = PREVIEW_HEIGHT / 2;
+    const size = Math.min(PREVIEW_WIDTH, PREVIEW_HEIGHT) * 0.90;
+    const radius = size / 2;
+    const fontSize = radius * 0.16; // ADJUST THIS: number size
+
+    // Get current time for clock hands
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+    const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+    const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+    const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
+    // Hexagon has 6 vertices at 60-degree intervals
+    // Position numbers to follow hexagon edges
+    const getHexagonPosition = (num) => {
+      let angle, distanceMultiplier;
+
+      // Numbers at vertices (on the points)
+      if (num === 12) {
+        angle = -90; // Top
+        distanceMultiplier = 0.75;
+      } else if (num === 2) {
+        angle = -30; // Top-right vertex
+        distanceMultiplier = 0.75;
+      } else if (num === 4) {
+        angle = 30; // Bottom-right vertex
+        distanceMultiplier = 0.75;
+      } else if (num === 6) {
+        angle = 90; // Bottom
+        distanceMultiplier = 0.75;
+      } else if (num === 8) {
+        angle = 150; // Bottom-left vertex
+        distanceMultiplier = 0.75;
+      } else if (num === 10) {
+        angle = -150; // Top-left vertex
+        distanceMultiplier = 0.75;
+      }
+      // Numbers on edges (between vertices)
+      else if (num === 1) {
+        angle = -60; // Between 12 and 2
+        distanceMultiplier = 0.70;
+      } else if (num === 3) {
+        angle = 0; // Between 2 and 4
+        distanceMultiplier = 0.70;
+      } else if (num === 5) {
+        angle = 60; // Between 4 and 6
+        distanceMultiplier = 0.70;
+      } else if (num === 7) {
+        angle = 120; // Between 6 and 8
+        distanceMultiplier = 0.70;
+      } else if (num === 9) {
+        angle = 180; // Between 8 and 10
+        distanceMultiplier = 0.70;
+      } else if (num === 11) {
+        angle = -120; // Between 10 and 12
+        distanceMultiplier = 0.70;
+      }
+
+      const angleRad = angle * (Math.PI / 180);
+      const numberRadius = radius * distanceMultiplier;
+
+      return {
+        x: centerX + numberRadius * Math.cos(angleRad),
+        y: centerY + numberRadius * Math.sin(angleRad)
+      };
+    };
+
+    return (
+      <Group>
+        {/* All 12 clock numbers positioned for hexagon shape */}
+        {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+          const pos = getHexagonPosition(num);
+
           return (
-            <Shape
-              key={`marker-${index}`}
-              sceneFunc={(ctx, shape) => {
-                ctx.beginPath();
-                ctx.arc(x, y, radius * 0.025, 0, Math.PI * 2);
-                ctx.fillStrokeShape(shape);
-              }}
+            <Text
+              key={num}
+              x={pos.x}
+              y={pos.y}
+              text={num.toString()}
+              fontSize={fontSize}
+              fontFamily="Arial Black, sans-serif"
+              fontWeight={700}
               fill={clockNumberColor}
-              opacity={0.5}
+              align="center"
+              verticalAlign="middle"
+              offsetX={fontSize * 0.5} // ADJUST THIS: horizontal centering
+              offsetY={fontSize * 0.5} // ADJUST THIS: vertical centering
+              shadowColor="rgba(0,0,0,0.3)"
+              shadowBlur={5}
+            />
+          );
+        })}
+
+        {/* Hour hand - Shortest and thickest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.45 = 45% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.45 * Math.cos(hourAngle),
+            centerY + radius * 0.45 * Math.sin(hourAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.045} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Minute hand - Medium length and thickness */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.60 = 60% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.60 * Math.cos(minuteAngle),
+            centerY + radius * 0.60 * Math.sin(minuteAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.03} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Second hand - Longest and thinnest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.65 = 65% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.65 * Math.cos(secondAngle),
+            centerY + radius * 0.65 * Math.sin(secondAngle)
+          ]}
+          stroke={clockSecondHandColor}
+          strokeWidth={radius * 0.018} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowBlur={2}
+        />
+
+        {/* Center dot - covers where all hands meet */}
+        <Shape
+          sceneFunc={(ctx, shape) => {
+            ctx.beginPath();
+            // ADJUST THIS: 0.04 = 4% of radius for center dot size
+            ctx.arc(centerX, centerY, radius * 0.04, 0, Math.PI * 2);
+            ctx.fillStrokeShape(shape);
+          }}
+          fill={clockHandColor}
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+      </Group>
+    );
+  };
+
+  // 4. OCTAGON CLOCK NUMBERS
+  const renderOctagonClockNumbers = () => {
+    const centerX = PREVIEW_WIDTH / 2;
+    const centerY = PREVIEW_HEIGHT / 2;
+    const radius = getShapeRadius();
+    const fontSize = radius * 0.20;
+
+    // Get current time
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+    const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+    const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+    const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
+    // Helper to place numbers exactly on an Octagon path
+    const getOctagonPosition = (index) => {
+      // 1. Calculate the angle of the number (0 = 3 o'clock in Math, -90 = 12 o'clock)
+      // index * 30 gives degrees from 12 o'clock. Subtract 90 to align with Math unit circle.
+      const angleInRadians = (index * 30 - 90) * (Math.PI / 180);
+
+      // 2. Determine the "Sector" of the octagon (each sector is 45 degrees or PI/4)
+      // We round to the nearest sector center to find which "face" of the octagon we are on.
+      const sectorSize = Math.PI / 4;
+      const nearestSectorAngle = Math.round(angleInRadians / sectorSize) * sectorSize;
+
+      // 3. Calculate how far this number's angle deviates from the center of its face
+      const deviation = angleInRadians - nearestSectorAngle;
+
+      // 4. Calculate Radius
+      // We define a base "Apothem" (distance from center to the flat edge of the octagon)
+      // We set this to ~75% of the full container radius so numbers fit inside.
+      const baseApothem = radius * 1.05 * Math.cos(Math.PI / 8); // Apothem of octagon
+
+      // Use trigonometry (secant) to push numbers out to the flat edge line
+      // r = apothem / cos(theta)
+      const numberRadius = baseApothem / Math.cos(deviation);
+
+      return {
+        x: centerX + numberRadius * Math.cos(angleInRadians),
+        y: centerY + numberRadius * Math.sin(angleInRadians)
+      };
+    };
+
+    return (
+      <Group>
+        {/* All 12 clock numbers positioned for octagon shape */}
+        {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+          const pos = getOctagonPosition(num);
+
+          return (
+            <Text
+              key={num}
+              x={pos.x}
+              y={pos.y}
+              text={num.toString()}
+              fontSize={fontSize}
+              fontFamily="Arial Black, sans-serif"
+              fontWeight={700}
+              fill={clockNumberColor}
+              shadowColor="rgba(0,0,0,0.3)"
+              shadowBlur={4}
+              offsetX={fontSize * 0.5}
+              offsetY={fontSize * 0.5}
+              align="center"
+              verticalAlign="middle"
+            />
+          );
+        })}
+
+        {/* Hour hand - Shortest and thickest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            centerX + radius * 0.70 * Math.cos(hourAngle), // ADJUST THIS: 0.50 = 50% of radius (was 0.40)
+            centerY + radius * 0.50 * Math.sin(hourAngle)  // ADJUST THIS: match the value above
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.045} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Minute hand - Medium length and thickness */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            centerX + radius * 0.75 * Math.cos(minuteAngle), // ADJUST THIS: 0.65 = 65% of radius (was 0.55)
+            centerY + radius * 0.65 * Math.sin(minuteAngle)  // ADJUST THIS: match the value above
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.03} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Second hand - Longest and thinnest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            centerX + radius * 0.90 * Math.cos(secondAngle), // ADJUST THIS: 0.70 = 70% of radius (was 0.60)
+            centerY + radius * 0.70 * Math.sin(secondAngle)  // ADJUST THIS: match the value above
+          ]}
+          stroke={clockSecondHandColor}
+          strokeWidth={radius * 0.018} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowBlur={2}
+        />
+
+        {/* Center dot */}
+        <Shape
+          sceneFunc={(ctx, shape) => {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.04, 0, Math.PI * 2);
+            ctx.fillStrokeShape(shape);
+          }}
+          fill={clockHandColor}
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+      </Group>
+    );
+  };
+
+  // 5. Diamond CloCk Numbers
+  const renderDiamondClockNumbers = () => {
+  const centerX = PREVIEW_WIDTH / 2;
+  const centerY = PREVIEW_HEIGHT / 2;
+  const size = Math.min(PREVIEW_WIDTH, PREVIEW_HEIGHT) * 0.85;
+  const fontSize = size * 0.08; // ADJUST THIS: number size (reduced from 0.09)
+  
+  // Get current time
+  const now = new Date();
+  const hours = now.getHours() % 12;
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+  const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+  const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+  const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
+  // Diamond shape positioning - ADJUST THESE to fit all numbers inside
+  const vertexDistance = size * 0.32; // ADJUST THIS: Distance to corner vertices (12, 3, 6, 9) - reduced from 0.40
+  const edgeDistance = size * 0.28; // ADJUST THIS: Distance to edge numbers (closer to center) - reduced from 0.35
+  const diagonalOffset = size * 0.22; // ADJUST THIS: How far along the diagonal edges - reduced from 0.28
+
+  return (
+    <Group>
+      {/* TOP VERTEX: 12 */}
+      <Text
+        x={centerX}
+        y={centerY - vertexDistance}
+        text="12"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.65} // ADJUST THIS: horizontal centering for "12"
+        offsetY={fontSize * 0.5}  // ADJUST THIS: vertical centering
+      />
+
+      {/* TOP-RIGHT EDGE: 11, 1 */}
+      <Text
+        x={centerX - diagonalOffset * 0.5}
+        y={centerY - edgeDistance}
+        text="11"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.55} // ADJUST THIS: horizontal centering for "11"
+        offsetY={fontSize * 0.5}
+      />
+      
+      <Text
+        x={centerX + diagonalOffset * 0.5}
+        y={centerY - edgeDistance}
+        text="1"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35} // ADJUST THIS: horizontal centering for single digits
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* RIGHT SIDE: 10, 2 */}
+      <Text
+        x={centerX - edgeDistance}
+        y={centerY - diagonalOffset * 0.5}
+        text="10"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.55} // ADJUST THIS: horizontal centering for "10"
+        offsetY={fontSize * 0.5}
+      />
+      
+      <Text
+        x={centerX + edgeDistance}
+        y={centerY - diagonalOffset * 0.5}
+        text="2"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* RIGHT VERTEX: 3 */}
+      <Text
+        x={centerX + vertexDistance}
+        y={centerY}
+        text="3"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* LEFT VERTEX: 9 */}
+      <Text
+        x={centerX - vertexDistance}
+        y={centerY}
+        text="9"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* BOTTOM SIDE: 8, 4 */}
+      <Text
+        x={centerX - edgeDistance}
+        y={centerY + diagonalOffset * 0.5}
+        text="8"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+      
+      <Text
+        x={centerX + edgeDistance}
+        y={centerY + diagonalOffset * 0.5}
+        text="4"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* BOTTOM EDGE: 7, 5 */}
+      <Text
+        x={centerX - diagonalOffset * 0.5}
+        y={centerY + edgeDistance}
+        text="7"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+      
+      <Text
+        x={centerX + diagonalOffset * 0.5}
+        y={centerY + edgeDistance}
+        text="5"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* BOTTOM VERTEX: 6 */}
+      <Text
+        x={centerX}
+        y={centerY + vertexDistance}
+        text="6"
+        fontSize={fontSize}
+        fontFamily="Arial Black, sans-serif"
+        fontWeight={700}
+        fill={clockNumberColor}
+        shadowColor="rgba(0,0,0,0.4)"
+        shadowBlur={4}
+        offsetX={fontSize * 0.35}
+        offsetY={fontSize * 0.5}
+      />
+
+      {/* Hour hand */}
+      <Line
+        points={[
+          centerX,
+          centerY,
+          centerX + size * 0.18 * Math.cos(hourAngle), // ADJUST THIS: hour hand length (reduced from 0.20)
+          centerY + size * 0.18 * Math.sin(hourAngle)
+        ]}
+        stroke={clockHandColor}
+        strokeWidth={size * 0.025} // ADJUST THIS: hour hand thickness
+        lineCap="round"
+        shadowColor="rgba(0,0,0,0.3)"
+        shadowBlur={3}
+      />
+
+      {/* Minute hand */}
+      <Line
+        points={[
+          centerX,
+          centerY,
+          centerX + size * 0.24 * Math.cos(minuteAngle), // ADJUST THIS: minute hand length (reduced from 0.28)
+          centerY + size * 0.24 * Math.sin(minuteAngle)
+        ]}
+        stroke={clockHandColor}
+        strokeWidth={size * 0.018} // ADJUST THIS: minute hand thickness
+        lineCap="round"
+        shadowColor="rgba(0,0,0,0.3)"
+        shadowBlur={3}
+      />
+
+      {/* Second hand */}
+      <Line
+        points={[
+          centerX,
+          centerY,
+          centerX + size * 0.28 * Math.cos(secondAngle), // ADJUST THIS: second hand length (reduced from 0.32)
+          centerY + size * 0.28 * Math.sin(secondAngle)
+        ]}
+        stroke={clockSecondHandColor}
+        strokeWidth={size * 0.012} // ADJUST THIS: second hand thickness
+        lineCap="round"
+        shadowColor="rgba(0,0,0,0.2)"
+        shadowBlur={2}
+      />
+
+      {/* Center dot */}
+      <Shape
+        sceneFunc={(ctx, shape) => {
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, size * 0.025, 0, Math.PI * 2); // ADJUST THIS: center dot size
+          ctx.fillStrokeShape(shape);
+        }}
+        fill={clockHandColor}
+        shadowColor="rgba(0,0,0,0.3)"
+        shadowBlur={3}
+      />
+    </Group>
+  );
+};
+
+
+  // 6. LEAF SHAPE - Simplified (4 corner numbers)
+  const renderLeafClockNumbers = () => {
+    const centerX = PREVIEW_WIDTH / 2;
+    const centerY = PREVIEW_HEIGHT / 2;
+    const radius = getShapeRadius();
+    const fontSize = radius * 0.18;
+
+    // Get current time
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+    const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+    const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+    const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
+    // Define custom positions for leaf shape (adjust radius based on angle)
+    const getLeafRadius = (angleIndex) => {
+      // Leaf shape has more width at top and tapers at bottom
+      const angle = angleIndex * 0; // 0, 30, 60, etc.                                      /////initial 30
+
+      if (angle >= 0 && angle <= 90) {
+        // Top right quadrant - wider
+        return radius * 1;
+      } else if (angle > 90 && angle <= 180) {
+        // Bottom right - tapers
+        return radius * 0.65;
+      } else if (angle > 180 && angle <= 270) {
+        // Bottom left - tapers
+        return radius * 0.65;
+      } else {
+        // Top left quadrant - wider
+        return radius * 0.75;
+      }
+    };
+
+    return (
+      <Group>
+        {/* All 12 clock numbers following leaf contour */}
+        {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, index) => {
+          const angle = (index * 30 - 90) * (Math.PI / 180);
+          const leafRadius = getLeafRadius(index * 30);
+          const x = centerX + leafRadius * Math.cos(angle);
+          const y = centerY + leafRadius * Math.sin(angle);
+
+          return (
+            <Text
+              key={num}
+              x={x}
+              y={y}
+              text={num.toString()}
+              fontSize={fontSize}
+              fontFamily="Arial Black, sans-serif"
+              fontWeight={700}
+              fill={clockNumberColor}
+              shadowColor="rgba(0,0,0,0.3)"
+              shadowBlur={4}
+              offsetX={fontSize * 0.5}
+              offsetY={fontSize * 0.5}
             />
           );
         })}
@@ -489,54 +1361,63 @@ export default function FrameEditor() {
         {/* Hour hand */}
         <Line
           points={[
-            centerX, 
-            centerY, 
-            centerX + radius * 0.45 * Math.cos((-90 + 60) * Math.PI / 180), 
-            centerY + radius * 0.45 * Math.sin((-90 + 60) * Math.PI / 180)
+            centerX,
+            centerY,
+            centerX + radius * 0.40 * Math.cos(hourAngle),
+            centerY + radius * 0.40 * Math.sin(hourAngle)
           ]}
           stroke={clockHandColor}
           strokeWidth={radius * 0.045}
           lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
         />
 
         {/* Minute hand */}
         <Line
           points={[
-            centerX, 
-            centerY, 
-            centerX + radius * 0.65 * Math.cos((-90 + 180) * Math.PI / 180), 
-            centerY + radius * 0.65 * Math.sin((-90 + 180) * Math.PI / 180)
+            centerX,
+            centerY,
+            centerX + radius * 0.55 * Math.cos(minuteAngle),
+            centerY + radius * 0.55 * Math.sin(minuteAngle)
           ]}
           stroke={clockHandColor}
           strokeWidth={radius * 0.03}
           lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
         />
 
         {/* Second hand */}
         <Line
           points={[
-            centerX, 
-            centerY, 
-            centerX + radius * 0.70 * Math.cos((-90 + 270) * Math.PI / 180), 
-            centerY + radius * 0.70 * Math.sin((-90 + 270) * Math.PI / 180)
+            centerX,
+            centerY,
+            centerX + radius * 0.60 * Math.cos(secondAngle),
+            centerY + radius * 0.60 * Math.sin(secondAngle)
           ]}
           stroke={clockSecondHandColor}
           strokeWidth={radius * 0.018}
           lineCap="round"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowBlur={2}
         />
 
         {/* Center dot */}
         <Shape
           sceneFunc={(ctx, shape) => {
             ctx.beginPath();
-            ctx.arc(centerX, centerY, radius * 0.06, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, radius * 0.04, 0, Math.PI * 2);
             ctx.fillStrokeShape(shape);
           }}
           fill={clockHandColor}
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
         />
       </Group>
     );
   };
+
 
   // Render clock frame with proper image fitting
   const renderClockFrame = () => {
@@ -552,7 +1433,7 @@ export default function FrameEditor() {
 
       const diameter = photoRadius * 2;
       const scale = Math.max(diameter / photoImg.width, diameter / photoImg.height);
-      
+
       const displayWidth = photoImg.width * scale;
       const displayHeight = photoImg.height * scale;
       const photoX = centerX - displayWidth / 2;
@@ -575,7 +1456,7 @@ export default function FrameEditor() {
               height={displayHeight}
             />
           </Group>
-          {renderClockOverlay()}
+          {renderCircleClockNumbers()}
         </Group>
       );
     }
@@ -614,7 +1495,7 @@ export default function FrameEditor() {
               height={displayHeight}
             />
           </Group>
-          {renderClockOverlay()}
+          {renderHexagonClockNumbers()}
         </Group>
       );
     }
@@ -653,7 +1534,7 @@ export default function FrameEditor() {
               height={displayHeight}
             />
           </Group>
-          {renderClockOverlay()}
+          {renderOctagonClockNumbers()}
         </Group>
       );
     }
@@ -688,7 +1569,7 @@ export default function FrameEditor() {
               height={displayHeight}
             />
           </Group>
-          {renderClockOverlay()}
+          {renderDiamondClockNumbers()}
         </Group>
       );
     }
@@ -727,22 +1608,48 @@ export default function FrameEditor() {
               height={displayHeight}
             />
           </Group>
-          {renderClockOverlay()}
+          {renderLeafClockNumbers()}
         </Group>
       );
     }
 
+
+
     // Square and Rounded Square
+
     const width = PREVIEW_WIDTH * 0.90;
     const height = PREVIEW_HEIGHT * 0.90;
     const offsetX = (PREVIEW_WIDTH - width) / 2;
     const offsetY = (PREVIEW_HEIGHT - height) / 2;
-    
+
     const scale = Math.max(width / photoImg.width, height / photoImg.height);
     const displayWidth = photoImg.width * scale;
     const displayHeight = photoImg.height * scale;
     const photoX = centerX - displayWidth / 2;
     const photoY = centerY - displayHeight / 2;
+
+    // Get current time for clock hands
+    const now = new Date();
+    const hours = now.getHours() % 12;
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Calculate angles (0 degrees is at 12 o'clock, clockwise)
+    const secondAngle = (seconds * 6 - 90) * (Math.PI / 180);
+    const minuteAngle = ((minutes + seconds / 60) * 6 - 90) * (Math.PI / 180);
+    const hourAngle = ((hours + minutes / 60) * 30 - 90) * (Math.PI / 180);
+
+    // ADJUST THIS: Radius for hand length calculations
+    const radius = Math.min(width, height) / 2;
+
+    // Clock number settings
+    const fontSize = Math.min(width, height) * 0.10; // ADJUST THIS: number size
+    const edgePadding = Math.min(width, height) * 0.10; // ADJUST THIS: distance from edges
+    const spacing = Math.min(width, height) * 0.22; // ADJUST THIS: spacing between numbers
+
+    // Calculate positions for square layout
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
 
     return (
       <Group>
@@ -771,7 +1678,241 @@ export default function FrameEditor() {
             height={displayHeight}
           />
         </Group>
-        {renderClockOverlay()}
+
+        {/* Clock Numbers - Square layout with even spacing */}
+
+        {/* TOP EDGE: 11, 12, 1 */}
+        <Text
+          x={centerX - spacing}
+          y={centerY - halfHeight + edgePadding}
+          text="11"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.55}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX}
+          y={centerY - halfHeight + edgePadding}
+          text="12"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.65}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX + spacing}
+          y={centerY - halfHeight + edgePadding}
+          text="1"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        {/* RIGHT EDGE: 2, 3, 4 */}
+        <Text
+          x={centerX + halfWidth - edgePadding}
+          y={centerY - spacing}
+          text="2"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX + halfWidth - edgePadding}
+          y={centerY}
+          text="3"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX + halfWidth - edgePadding}
+          y={centerY + spacing}
+          text="4"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        {/* BOTTOM EDGE: 5, 6, 7 */}
+        <Text
+          x={centerX + spacing}
+          y={centerY + halfHeight - edgePadding}
+          text="5"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX}
+          y={centerY + halfHeight - edgePadding}
+          text="6"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX - spacing}
+          y={centerY + halfHeight - edgePadding}
+          text="7"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        {/* LEFT EDGE: 8, 9, 10 */}
+        <Text
+          x={centerX - halfWidth + edgePadding}
+          y={centerY + spacing}
+          text="8"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX - halfWidth + edgePadding}
+          y={centerY}
+          text="9"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.35}
+          offsetY={fontSize * 0.5}
+        />
+
+        <Text
+          x={centerX - halfWidth + edgePadding}
+          y={centerY - spacing}
+          text="10"
+          fontSize={fontSize}
+          fontFamily="Arial Black, sans-serif"
+          fontWeight={700}
+          fill={clockNumberColor}
+          shadowColor="rgba(0,0,0,0.4)"
+          shadowBlur={4}
+          offsetX={fontSize * 0.55}
+          offsetY={fontSize * 0.5}
+        />
+
+        {/* Hour hand - Shortest and thickest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.50 = 50% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.50 * Math.cos(hourAngle),
+            centerY + radius * 0.50 * Math.sin(hourAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.045} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Minute hand - Medium length and thickness */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.65 = 65% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.65 * Math.cos(minuteAngle),
+            centerY + radius * 0.65 * Math.sin(minuteAngle)
+          ]}
+          stroke={clockHandColor}
+          strokeWidth={radius * 0.03} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
+
+        {/* Second hand - Longest and thinnest */}
+        <Line
+          points={[
+            centerX,
+            centerY,
+            // ADJUST THIS: 0.70 = 70% of radius (increase/decrease for longer/shorter)
+            centerX + radius * 0.70 * Math.cos(secondAngle),
+            centerY + radius * 0.70 * Math.sin(secondAngle)
+          ]}
+          stroke={clockSecondHandColor}
+          strokeWidth={radius * 0.018} // ADJUST THIS: hand thickness
+          lineCap="round"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowBlur={2}
+        />
+
+        {/* Center dot - covers where all hands meet */}
+        <Shape
+          sceneFunc={(ctx, shape) => {
+            ctx.beginPath();
+            // ADJUST THIS: 0.04 = 4% of radius for center dot size
+            ctx.arc(centerX, centerY, radius * 0.04, 0, Math.PI * 2);
+            ctx.fillStrokeShape(shape);
+          }}
+          fill={clockHandColor}
+          shadowColor="rgba(0,0,0,0.3)"
+          shadowBlur={3}
+        />
       </Group>
     );
   };
@@ -970,10 +2111,13 @@ export default function FrameEditor() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 py-30">
+      <Sidebar />
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-medium text-center text-gray-900 mb-6">
-          {getEditorTitle()}
-        </h1>
+     <h1 className="text-4xl font-medium text-center mb-8 tracking-tight">
+  <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
+    {getEditorTitle()}
+  </span>
+</h1>
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 flex items-center justify-center">
@@ -983,13 +2127,13 @@ export default function FrameEditor() {
                   <div className="text-center">
                     <div className="relative w-20 h-20 mx-auto mb-4">
                       <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-                      <div 
+                      <div
                         className="absolute inset-0 border-4 border-red-600 rounded-full border-t-transparent animate-spin"
                       ></div>
                     </div>
                     <p className="text-gray-900 font-semibold text-lg mb-2">Removing Background...</p>
                     <div className="w-64 bg-gray-200 rounded-full h-3 mb-2">
-                      <div 
+                      <div
                         className="bg-red-600 h-3 rounded-full transition-all duration-300"
                         style={{ width: `${processingProgress}%` }}
                       ></div>
@@ -1095,7 +2239,7 @@ export default function FrameEditor() {
               />
               <button
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-md flex items-center justify-center gap-2 transition-colors"
+                className="w-full cursor-pointer bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-md flex items-center justify-center gap-2 transition-colors"
                 disabled={isProcessing}
               >
                 <svg
@@ -1126,7 +2270,7 @@ export default function FrameEditor() {
                         key={c}
                         onClick={() => setClockNumberColor(c)}
                         className={
-                          "w-9 h-9 rounded border-2 transition-all " +
+                          "w-9 h-9 rounded border-2 transition-all cursor-pointer " +
                           (clockNumberColor === c ? "border-blue-500 scale-110 ring-2 ring-blue-300" : "border-gray-300")
                         }
                         style={{ backgroundColor: c }}
@@ -1150,8 +2294,8 @@ export default function FrameEditor() {
                         key={c}
                         onClick={() => setClockHandColor(c)}
                         className={
-                          "w-9 h-9 rounded border-2 transition-all " +
-                          (clockHandColor === c ? "border-blue-500 scale-110 ring-2 ring-blue-300" : "border-gray-300")
+                          "w-9 h-9 rounded border-2 transition-all cursor-pointer" +
+                          (clockHandColor === c ? "border-blue-500 scale-110 ring-2 ring-blue-300 cursor-pointer" : "border-gray-300 cursor-pointer ")
                         }
                         style={{ backgroundColor: c }}
                       />
@@ -1174,7 +2318,7 @@ export default function FrameEditor() {
                         key={c}
                         onClick={() => setClockSecondHandColor(c)}
                         className={
-                          "w-9 h-9 rounded border-2 transition-all " +
+                          "w-9 h-9 rounded border-2 transition-all cursor-pointer " +
                           (clockSecondHandColor === c ? "border-blue-500 scale-110 ring-2 ring-blue-300" : "border-gray-300")
                         }
                         style={{ backgroundColor: c }}
